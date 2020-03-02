@@ -1,5 +1,3 @@
-# Awesome-Quant
-
 # A platform for quant friends
 
 
