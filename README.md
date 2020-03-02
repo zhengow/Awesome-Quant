@@ -1,6 +1,7 @@
 # Awesome-Quant
-:smiley: A platform for quant friends/量化工作者信息平台
-# 互联网求职面试题、知识点和面经整理。祝你求职顺利。
+
+# A platform for quant friends
+
 
 ## 编码相关
 
