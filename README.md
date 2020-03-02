@@ -4,7 +4,7 @@
 ## 内容相关
 
 - [Kaggle/天池算法竞赛](https://github.com/lemonjing/EasyJob/blob/master/Questions/java_summary.md)
-- [求职信息](https://github.com/lemonjing/algorithm)
+- [量化工作求职信息](https://github.com/lemonjing/algorithm)
 
 
 ## 更新日志：
@@ -16,9 +16,9 @@
 ```sh
 .
 ├── 01-Contest
-│   ├── README.md
+│   └──README.md
 ├── 02-Job
-│   ├── README.md
+│   └──README.md
 ```
 
 ## 参与贡献
