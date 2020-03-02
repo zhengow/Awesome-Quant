@@ -3,8 +3,10 @@
 
 ## 内容相关
 
-- [Kaggle/天池算法竞赛](https://github.com/lemonjing/EasyJob/blob/master/Questions/java_summary.md)
-- [量化工作求职信息](https://github.com/lemonjing/algorithm)
+- [Kaggle/天池算法竞赛](https://github.com/zhengow/Awesome-Quant/tree/master/01-Contest)
+- [量化工作求职信息](https://github.com/zhengow/Awesome-Quant/tree/master/02-Job)
+- [量化相关学习资料](https://github.com/zhengow/Awesome-Quant/tree/master/03-Study)
+- [其他信息](https://github.com/zhengow/Awesome-Quant/tree/master/04-Others)
 
 
 ## 更新日志：
@@ -16,8 +18,12 @@
 ```sh
 .
 ├── 01-Contest
-│   └──README.md
+    └──README.md
 ├── 02-Job
+    └──README.md
+├── 03-Study
+    └──README.md
+├── 04-Others
     └──README.md
 ```
 
