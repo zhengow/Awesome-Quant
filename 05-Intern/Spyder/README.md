@@ -20,7 +20,7 @@ if __name__ == "__main__":
     print(BaiduIndex.province_code)
     
     # main
-    keywords = ['爬虫', 'lol', '张艺兴', '人工智能', '华为', '武林外传']
+    keywords = ['600519', '000001']
     baidu_index = BaiduIndex(keywords, '2018-01-01', '2019-05-02')
     for index in baidu_index.get_index():
         print(index)
@@ -37,11 +37,4 @@ if __name__ == "__main__":
 - 有些代码不是特别严谨, 有需要请自己DIY
 - 媒体指数不支持细分地域查询
 
-
-### update 
-2018/02/10 更新格式化数据的方法format_data  
-2018/12/29 更新查询指定区域百度指数的功能  
-2018/11/07 更新  
-2019/05/31 更新  
-2020/02/14 添加咨询指数和媒体指数的功能
 
