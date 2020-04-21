@@ -1,12 +1,14 @@
 import numpy as np
 import pandas as pd
+from data import Data
 
-class Alpha():
+class Alpha(object):
     
-    def __init__(self, start_date, end_date, hist = 10):
-        self.hist = hist
-        self.trade_date = self.get_trade_date(start_date, end_date)
+    def __init__(self, start_date, end_date):
+        print("father")
+        self.trade_date = Date.get('date', start_date, end_date)
         self._init_data()
+        #self.run()
     
     def _init_data(self):
         pass
@@ -17,7 +19,7 @@ class Alpha():
         '''
         pass
     
-    def get_alpha(self):
+    def get(self):
         return self.alpha
         
     def Neutralize(self, method):
@@ -33,14 +35,32 @@ class Alpha():
 
 class Alpha1(Alpha):
     
+    def __init__(self, start_date, end_date):
+        print("child")
+        self.trade_date = Date.get('date', start_date, end_date)
+        self._init_data()
+        self.run()
+    
     def run(self):
         '''
         Calculate!
         '''
-    def _init_data(self, hist):
-        data = Data()
+        delay = 1
+        
+        data = self.close
+        
+        for di in range(self.start, self.end):
+            self.alpha[di-self.start,:] = data.iloc[di-delay,:]
+        
+        
+    def _init_data(self):
+        
         hist = 10
-        self.close = data.get('close', hist)
-        self.high = data.get('high', hist)
-        self.alpha = np.full([])
+        start = self.trade_date.iloc[0]
+        end = self.trade_date.iloc[-1]
+        self.close = Data.get('close', start, end, hist)
+        #self.high = Data.get('high', start, end, hist)
+
+        self.alpha = np.full([self.trade_date.shape[0], self.close.shape[1]], np.nan)
+        
         

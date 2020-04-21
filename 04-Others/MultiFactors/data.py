@@ -1,36 +1,39 @@
 import pandas as pd
+import numpy as np
 
 class Data():
     
-    def __init__(self, start_date, end_date):
+    def __init__():
+        pass
+        #self.trade_date = self.get_trade_date(start_date, end_date)
         
-        self.trade_date = self.get_trade_date(start_date, end_date)
+    '''
+    def get_trade_date(start_date, end_date):
         
-    
-    def get_trade_date(self, start_date, end_date):
         date = pd.read_csv('date.csv')
         return date.loc[start_date:end_date,:]
+    '''
     
-    def get(self, data, hist = 0):
-        if(data=='close'):
-            load_data = pd.DataFrame('close.csv')
-        if(data=='high'):
-            1
-        if(data=='low'):
-            1
-        if(data=='open'):
-            1
-        if(data=='vwap'):
-            1
-        if(data=='high'):
-            1
-        if(data=='close'):
-            1
-        if(data=='high'):
-            1
+    def get(data, startdate, enddate, hist = 0):
+
+        if(data=='date'):
+            start = 0
+            end = 0
+            df = pd.read_csv('date.csv')
+            for ii in range(df.shape[0]):
+                if(df['date'][ii]>startdate):
+                    start = ii
+                    break
+            for ii in range(start+1, df.shape[0]):
+                if(df['date'][ii]>enddate):
+                    end = ii
+                    break
+            return df['date'][start:end]
         
-        if(self.trade_date.index[0]-hist<0):
-            print("Out of time range!")
-            return
-        
-        return load_data.iloc[self.trade_date.index[0]-hist:self.trade_date.index[-1],:]
+        try:
+            df = pd.read_csv(data+'.csv', index_col='date')
+            start = np.where(df.index == startdate)[0].tolist()[0]-hist
+            end = np.where(df.index == enddate)[0].tolist()[0]
+            return df.iloc[start:end+1,:]
+        except Exception as e:
+            print(e)
