@@ -56,10 +56,12 @@ class BacktestEngine(object):
             pos[pos<0] = 0
             pos[pd.isnull(pos)|cond] = 0
             pos = pos/np.sum(pos)
+            print("pos: ", pos[:5])
             neg = alpha[ii,:].copy()
             neg[neg>0] = 0
             neg[pd.isnull(neg)|cond] = 0
             neg = -neg/np.sum(neg)
+            print("neg: ", neg[:5])
             self.posret[ii] = np.dot(pos, ret)
             self.negret[ii] = np.dot(neg, ret)
             self.ret[ii] = (self.posret[ii]+self.negret[ii])/2
