@@ -28,12 +28,14 @@ class Data():
                 if(df['date'][ii]>enddate):
                     end = ii
                     break
+            print("load date is finished!")
             return df['date'][start:end]
         
         try:
             df = pd.read_csv(data+'.csv', index_col='date')
             start = np.where(df.index == startdate)[0].tolist()[0]-hist
             end = np.where(df.index == enddate)[0].tolist()[0]
+            print("load", data, "is finished!")
             return df.iloc[start:end+1,:]
         except Exception as e:
             print(e)

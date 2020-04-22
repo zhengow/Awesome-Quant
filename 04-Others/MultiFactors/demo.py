@@ -1,5 +1,7 @@
-from alf import *
+from alf import Alpha1
 from backtest import BacktestEngine
+
+
 
 if __name__ == '__main__':
     
