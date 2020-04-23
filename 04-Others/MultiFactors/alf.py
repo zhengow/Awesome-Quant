@@ -109,7 +109,7 @@ class Alpha2(Alpha):
     '''
     shrp 1.9909
     '''
-    def run(self):
+    def run(self, hd):
         '''
         Calculate!
         '''
@@ -137,7 +137,7 @@ class Alpha3(Alpha):
     '''
     shrp 1.312
     '''
-    def run(self):
+    def run(self, hd):
         '''
         Calculate!
         '''
@@ -164,7 +164,7 @@ class Alpha4(Alpha):
     shrp 1.814
     GTJA 1
     '''
-    def run(self):
+    def run(self, hd):
         '''
         Calculate!
         '''
@@ -198,7 +198,7 @@ class Alpha5(Alpha):
     shrp 2.914
     GTJA 2
     '''
-    def run(self):
+    def run(self, hd):
         '''
         Calculate!
         '''
@@ -226,7 +226,7 @@ class Alpha6(Alpha):
     shrp 3.797
     GTJA 7
     '''
-    def run(self):
+    def run(self, hd):
         '''
         Calculate!
         '''
@@ -262,7 +262,7 @@ class Alpha7(Alpha):
     shrp 4.621
     GTJA 114
     '''
-    def run(self):
+    def run(self, hd):
         '''
         Calculate!
         '''
@@ -298,7 +298,7 @@ class Alpha8(Alpha):
     shrp 7.588
     GTJA 119
     '''
-    def run(self):
+    def run(self, hd):
         '''
         Calculate!
         '''
