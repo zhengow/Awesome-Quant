@@ -11,19 +11,22 @@ class BacktestEngine(object):
     process data to standard form.
     """
     
-    def __init__(self, alpha):
+    def __init__(self, alpha, trade_date):
         
-        self.trade_date = alpha.trade_date
+        self.trade_date = trade_date
         self.dailyret = Data.get('ret', self.trade_date.iloc[0], self.trade_date.iloc[-1])
         self.inxret = Data.get('inxret', self.trade_date.iloc[0], self.trade_date.iloc[-1])
+        self.all = Data.get('all', self.trade_date.iloc[0], self.trade_date.iloc[-1])
+        #stop = (1-pd.isnull(self.all)).astype(np.bool)
+        self.dailyret[pd.isnull(self.all)] = np.nan
         self.trade_days = self.trade_date.shape[0]
         self.cash = np.full([self.trade_days+1],1000000.0)
         self.posret = np.full([self.trade_days],np.nan)
         self.negret = np.full([self.trade_days],np.nan)
         self.ret = np.full([self.trade_days],np.nan)
         self.shrp = np.full([10],np.nan)
-        dummy = alpha.alpha.copy()
-        self.run(dummy)
+        #dummy = alpha.alpha.copy()
+        self.run(alpha)
     
     def run(self, alpha):
         for ii in range(self.trade_days):
@@ -62,7 +65,7 @@ class BacktestEngine(object):
             ret_std = np.std(ret_10[ii])
             IC = ret_mean/ret_std
             self.shrp[ii] = IC*np.sqrt(252)
-            print("Year ", ii+1, " shrp: ", self.shrp[ii])
+            print("Year", ii+2010, '.1.1 to', ii+2011, '.1.1 shrp/ret: ', self.shrp[ii], np.sum(ret_10[ii]))
         print("average shrp: ", np.mean(self.shrp))
         
     def show(self):
@@ -70,6 +73,7 @@ class BacktestEngine(object):
         xticks = []
         for ii in range(10):
             xticks.append(self.trade_date.iloc[ii*len_10])
-        plt.plot(self.dailyret.index, self.cash[1:])
-        plt.xticks(xticks)
+        x = np.arange(len(self.dailyret.index))
+        plt.plot(x, self.cash[1:])
+        #plt.xticks(xticks)
         plt.show()
