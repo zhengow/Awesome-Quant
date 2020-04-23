@@ -35,6 +35,12 @@ class Op(object):
         return pd.DataFrame(data).rank(pct=True, axis=1)
     def rank_row(data):
         return pd.DataFrame(data).rank(pct=True, axis=0)
+    def tsmax(data, window):
+        rank = np.full([data.shape[0], data.shape[1]], np.nan)
+        for ii in range(window, data.shape[0]+1):
+            tmp = data.iloc[ii-window:ii,:]
+            rank[ii-1,:] = self.rank_row(tmp).iloc[-1]
+        return rank
     
 
 class Alpha(object):
@@ -115,8 +121,8 @@ class Alpha2(Alpha):
         '''
         delay = 1
         #data = self.close.shift(5)-self.close
-        data = self.close.rolling(10).corr(self.vol)
-        data = self.rank_col(data)
+        data = hd['close'].rolling(10).corr(hd['volume'])
+        data = Op.rank_col(data)
         
         start = hd['startidx']
         end = hd['endidx']
@@ -143,7 +149,7 @@ class Alpha3(Alpha):
         '''
         delay = 1
         #data = self.close.shift(5)-self.close
-        data = self.amount.rolling(10).std()
+        data = hd['amount'].rolling(10).std()
         #data = self.Rank(data)
         
         start = hd['startidx']
@@ -170,11 +176,10 @@ class Alpha4(Alpha):
         '''
         delay = 1
         #data = self.close.shift(5)-self.close
-        self.volume[self.volume==0] = np.nan
-        lnvol = np.log(self.volume)
+        lnvol = np.log(hd['volume'])
         lnvol_d = lnvol-lnvol.shift()
-        rank1 = self.rank_col(lnvol_d)
-        rank2 = self.rank_col((self.close-self.open)/self.open)
+        rank1 = Op.rank_col(lnvol_d)
+        rank2 = Op.rank_col((hd['close']-hd['open'])/hd['open'])
         corr = rank1.rolling(6).corr(rank2)
         data = -corr
         #data = self.Rank(data)
@@ -204,7 +209,7 @@ class Alpha5(Alpha):
         '''
         delay = 1
         #data = self.close.shift(5)-self.close
-        data1 = ((self.close-self.low)-(self.high-self.close))/(self.high-self.low)
+        data1 = ((hd['close']-hd['low'])-(hd['high']-hd['close']))/(hd['high']-hd['low'])
         data = data1-data1.shift()
         #data = self.Rank(data)
         
@@ -232,13 +237,13 @@ class Alpha6(Alpha):
         '''
         delay = 1
         #data = self.close.shift(5)-self.close
-        data1 = self.vwap-self.close
+        data1 = hd['vwap']-hd['close']
         data1[data1<3] = 3
-        rank1 = self.rank_col(data1)
+        rank1 = Op.rank_col(data1)
         
-        data2 = self.vwap-self.close
+        data2 = hd['vwap']-hd['close']
         data2[data2>3] = 3
-        rank2 = self.rank_col(data2)
+        rank2 = Op.rank_col(data2)
         
         self.volume[self.volume==0] = np.nan
         rank3 = self.rank_col(self.volume-self.volume.shift(3))
@@ -255,9 +260,37 @@ class Alpha6(Alpha):
         
         self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         print("Neutralize is finished!")
-        
 
 class Alpha7(Alpha):
+    '''
+    shrp 3.797
+    GTJA 16
+    '''
+    def run(self, hd):
+        '''
+        Calculate!
+        '''
+        delay = 1
+        #data = self.close.shift(5)-self.close
+        rank1 = Op.rank_col(hd['volume'])
+        rank2 = Op.rank_col(hd['vwap'])
+        corr = rank1.rolling(5).corr(rank2)
+        window = 5
+        for ii in range(window, corr.shape[0]+1):
+        
+        start = hd['startidx']
+        end = hd['endidx']
+        
+        #self.alpha = data.iloc[start-delay:end+1,:]
+        
+        for di in range(start, end+1):
+            self.alpha[di-start,:] = data.iloc[di-delay,:]
+        print("Alpha is finished!")
+        
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
+        print("Neutralize is finished!")
+
+class Alpha8(Alpha):
     '''
     shrp 4.621
     GTJA 114
@@ -268,12 +301,11 @@ class Alpha7(Alpha):
         '''
         delay = 1
 
-        self.volume[self.volume==0] = np.nan
-        data1 = (self.high-self.low)/(self.close.rolling(5).sum()/5)
+        data1 = (hd['high']-hd['low'])/(hd['close'].rolling(5).sum()/5)
 
         #rank1 = self.rank_col(data1)
-        rank1 = self.rank_col(data1.shift(2))
-        rank2 = self.rank_col(self.volume)
+        rank1 = Op.rank_col(data1.shift(2))
+        rank2 = Op.rank_col(hd['volume'])
     
         data3 = data1/(self.vwap-self.close)
         data3[data3==0] = np.nan
@@ -293,7 +325,7 @@ class Alpha7(Alpha):
         
         
 
-class Alpha8(Alpha):
+class Alpha9(Alpha):
     '''
     shrp 7.588
     GTJA 119
@@ -316,10 +348,11 @@ class Alpha8(Alpha):
         rank3 = self.rank_col(self.volume.rolling(15).mean())
         corr2 = rank2.rolling(21).corr(rank3)
         window = 7
-        rank4 = np.full([corr2.shape[0], corr2.shape[1]], np.nan)
-        for ii in range(window, corr2.shape[0]+1):
-            tmp = corr2.iloc[ii-window:ii,:]
-            rank4[ii-window,:] = self.rank_row(tmp).iloc[-1,:]
+        rank4 = Op.tsrank(corr, 7)
+        #rank4 = np.full([corr2.shape[0], corr2.shape[1]], np.nan)
+        #for ii in range(window, corr2.shape[0]+1):
+        #    tmp = corr2.iloc[ii-window:ii,:]
+        #    rank4[ii-1,:] = self.rank_row(tmp).iloc[-1,:]
         
         data2 = pd.DataFrame(rank4)
         data2 = data2.ewm(8).mean()
