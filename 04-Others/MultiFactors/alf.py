@@ -29,6 +29,8 @@ class Op(object):
         else:
             print("No such Neutralization!!")
             '''
+        return alpha
+    
     def rank_col(data):
         return pd.DataFrame(data).rank(pct=True, axis=1)
     def rank_row(data):
@@ -49,35 +51,6 @@ class Alpha(object):
     def get(self):
         return self._alpha
     
-    '''
-    def Neutralize(self, method):
-        print(method)
-        if(method == 'test'):
-            for ii in range(self.alpha.shape[0]):
-                mean = np.nanmean(self.alpha[ii,:])
-                self.alpha[ii,:] = self.alpha[ii,:] - mean
-            
-        if(method == "IND"):
-            inds = pd.read_csv('groupdata.csv', index_col='date')
-            start = np.where(inds.index == self.start)[0].tolist()[0]
-            end = np.where(inds.index == self.end)[0].tolist()[0]
-            for di in range(start, end+1):
-                series = inds.iloc[di,:]
-                for ind in series.unique():
-                    cond = (series==ind)
-                    mean = np.nanmean(self.alpha[di-start][cond])
-                    self.alpha[di-start][cond] = self.alpha[di-start][cond] - mean
-
-        if(method == "MV"):
-            1
-        else:
-            print("No such Neutralization!!")
-
-    def rank_col(self, data):
-        return pd.DataFrame(data).rank(pct=True, axis=1)
-    def rank_row(self, data):
-        return pd.DataFrame(data).rank(pct=True, axis=0)
-    '''
     
 class Alphatest(Alpha):
     
@@ -100,7 +73,7 @@ class Alphatest(Alpha):
             self._alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
-        #self.Neutralize('IND')
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         #print("Neutralize is finished!")
         
         
@@ -109,17 +82,16 @@ class Alpha1(Alpha):
     '''
     shrp 1.724
     '''
-    def run(self):
+    def run(self, hd):
         '''
         Calculate!
         '''
         delay = 1
         #data = self.close.shift(5)-self.close
-        data = self.close.rolling(10).corr(self.vol)
+        data = hd['close'].rolling(10).corr(hd['vol'])
 
-        
-        start = np.where(data.index == self.start)[0].tolist()[0]
-        end = np.where(data.index == self.end)[0].tolist()[0]
+        start = hd['startidx']
+        end = hd['endidx']
         
         #self.alpha = data.iloc[start-delay:end+1,:]
         
@@ -127,22 +99,11 @@ class Alpha1(Alpha):
             self.alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
-        self.Neutralize('IND')
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         print("Neutralize is finished!")
         
         
-        
-    def _init_data(self):
-        
-        hist = 20
-
-        self.close = Data.get('close', self.start, self.end, hist)
-        self.vol = Data.get('volume', self.start, self.end, hist)
-        self.vol[self.vol==0] = np.nan
-        #self.high = Data.get('high', start, end, hist)
-        
-        self.alpha = np.full([self.trade_date.shape[0], self.close.shape[1]], np.nan)
-        print("init data is finished!")
+    
         
 class Alpha2(Alpha):
     '''
@@ -157,8 +118,8 @@ class Alpha2(Alpha):
         data = self.close.rolling(10).corr(self.vol)
         data = self.rank_col(data)
         
-        start = np.where(data.index == self.start)[0].tolist()[0]
-        end = np.where(data.index == self.end)[0].tolist()[0]
+        start = hd['startidx']
+        end = hd['endidx']
         
         #self.alpha = data.iloc[start-delay:end+1,:]
         
@@ -166,22 +127,11 @@ class Alpha2(Alpha):
             self.alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
-        self.Neutralize('IND')
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         print("Neutralize is finished!")
         
         
-        
-    def _init_data(self):
-        
-        hist = 20
 
-        self.close = Data.get('close', self.start, self.end, hist)
-        self.vol = Data.get('volume', self.start, self.end, hist)
-        self.vol[self.vol==0] = np.nan
-        #self.high = Data.get('high', start, end, hist)
-        
-        self.alpha = np.full([self.trade_date.shape[0], self.close.shape[1]], np.nan)
-        print("init data is finished!")
 
 class Alpha3(Alpha):
     '''
@@ -196,8 +146,8 @@ class Alpha3(Alpha):
         data = self.amount.rolling(10).std()
         #data = self.Rank(data)
         
-        start = np.where(data.index == self.start)[0].tolist()[0]
-        end = np.where(data.index == self.end)[0].tolist()[0]
+        start = hd['startidx']
+        end = hd['endidx']
         
         #self.alpha = data.iloc[start-delay:end+1,:]
         
@@ -205,19 +155,9 @@ class Alpha3(Alpha):
             self.alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
-        self.Neutralize('IND')
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         print("Neutralize is finished!")
         
-        
-        
-    def _init_data(self):
-        
-        hist = 20
-
-        self.amount = Data.get('amount', self.start, self.end, hist)
-        
-        self.alpha = np.full([self.trade_date.shape[0], self.amount.shape[1]], np.nan)
-        print("init data is finished!")
         
 class Alpha4(Alpha):
     '''
@@ -239,8 +179,8 @@ class Alpha4(Alpha):
         data = -corr
         #data = self.Rank(data)
         
-        start = np.where(data.index == self.start)[0].tolist()[0]
-        end = np.where(data.index == self.end)[0].tolist()[0]
+        start = hd['startidx']
+        end = hd['endidx']
         
         #self.alpha = data.iloc[start-delay:end+1,:]
         
@@ -248,20 +188,9 @@ class Alpha4(Alpha):
             self.alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
-        self.Neutralize('IND')
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         print("Neutralize is finished!")
         
-        
-        
-    def _init_data(self):
-        
-        hist = 20
-
-        self.volume = Data.get('volume', self.start, self.end, hist)
-        self.close = Data.get('close', self.start, self.end, hist)
-        self.open = Data.get('open', self.start, self.end, hist)
-        self.alpha = np.full([self.trade_date.shape[0], self.close.shape[1]], np.nan)
-        print("init data is finished!")
         
 
 class Alpha5(Alpha):
@@ -279,8 +208,8 @@ class Alpha5(Alpha):
         data = data1-data1.shift()
         #data = self.Rank(data)
         
-        start = np.where(data.index == self.start)[0].tolist()[0]
-        end = np.where(data.index == self.end)[0].tolist()[0]
+        start = hd['startidx']
+        end = hd['endidx']
         
         #self.alpha = data.iloc[start-delay:end+1,:]
         
@@ -288,20 +217,9 @@ class Alpha5(Alpha):
             self.alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
-        self.Neutralize('IND')
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         print("Neutralize is finished!")
         
-        
-        
-    def _init_data(self):
-        
-        hist = 20
-
-        self.low = Data.get('low', self.start, self.end, hist)
-        self.close = Data.get('close', self.start, self.end, hist)
-        self.high = Data.get('high', self.start, self.end, hist)
-        self.alpha = np.full([self.trade_date.shape[0], self.close.shape[1]], np.nan)
-        print("init data is finished!")
         
 class Alpha6(Alpha):
     '''
@@ -326,8 +244,8 @@ class Alpha6(Alpha):
         rank3 = self.rank_col(self.volume-self.volume.shift(3))
         data = rank1+rank2*rank3
         
-        start = np.where(data.index == self.start)[0].tolist()[0]
-        end = np.where(data.index == self.end)[0].tolist()[0]
+        start = hd['startidx']
+        end = hd['endidx']
         
         #self.alpha = data.iloc[start-delay:end+1,:]
         
@@ -335,20 +253,9 @@ class Alpha6(Alpha):
             self.alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
-        self.Neutralize('IND')
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         print("Neutralize is finished!")
         
-        
-        
-    def _init_data(self):
-        
-        hist = 20
-
-        self.vwap = Data.get('vwap', self.start, self.end, hist)
-        self.close = Data.get('close', self.start, self.end, hist)
-        self.volume = Data.get('volume', self.start, self.end, hist)
-        self.alpha = np.full([self.trade_date.shape[0], self.close.shape[1]], np.nan)
-        print("init data is finished!")
 
 class Alpha7(Alpha):
     '''
@@ -372,8 +279,8 @@ class Alpha7(Alpha):
         data3[data3==0] = np.nan
         data = rank1*rank2/data3
         
-        start = np.where(data.index == self.start)[0].tolist()[0]
-        end = np.where(data.index == self.end)[0].tolist()[0]
+        start = hd['startidx']
+        end = hd['endidx']
         
         #self.alpha = data.iloc[start-delay:end+1,:]
         
@@ -381,21 +288,10 @@ class Alpha7(Alpha):
             self.alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
-        self.Neutralize('IND')
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         print("Neutralize is finished!")
         
         
-        
-    def _init_data(self):
-        
-        hist = 20
-        self.high = Data.get('high', self.start, self.end, hist)
-        self.low = Data.get('low', self.start, self.end, hist)
-        self.vwap = Data.get('vwap', self.start, self.end, hist)
-        self.close = Data.get('close', self.start, self.end, hist)
-        self.volume = Data.get('volume', self.start, self.end, hist)
-        self.alpha = np.full([self.trade_date.shape[0], self.close.shape[1]], np.nan)
-        print("init data is finished!")
 
 class Alpha8(Alpha):
     '''
@@ -409,8 +305,7 @@ class Alpha8(Alpha):
         delay = 1
 
         self.volume[self.volume==0] = np.nan
-        start = np.where(self.volume.index == self.start)[0].tolist()[0]
-        end = np.where(self.volume.index == self.end)[0].tolist()[0]
+
         data1 = self.volume.rolling(5).mean()
         data1 = data1.rolling(26).sum()
         corr = self.vwap.rolling(5).corr(data1)
@@ -437,25 +332,16 @@ class Alpha8(Alpha):
         
         #self.alpha = data.iloc[start-delay:end+1,:]
         
+        start = hd['startidx']
+        end = hd['endidx']
+        
         for di in range(start, end+1):
             self.alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
-        self.Neutralize('IND')
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         print("Neutralize is finished!")
         
-        
-        
-    def _init_data(self):
-        
-        hist = 50
-        self.open = Data.get('open', self.start, self.end, hist)
-        self.high = Data.get('high', self.start, self.end, hist)
-        self.low = Data.get('low', self.start, self.end, hist)
-        self.vwap = Data.get('vwap', self.start, self.end, hist)
-        self.close = Data.get('close', self.start, self.end, hist)
-        self.volume = Data.get('volume', self.start, self.end, hist)
-        self.alpha = np.full([self.trade_date.shape[0], self.close.shape[1]], np.nan)
-        print("init data is finished!")
+
         
         
