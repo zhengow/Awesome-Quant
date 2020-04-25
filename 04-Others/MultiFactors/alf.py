@@ -1,47 +1,7 @@
 import numpy as np
 import pandas as pd
+from Operator import Op
 
-class Op(object):
-    
-    def __init__(self):
-        pass
-    
-    def Neutralize(method, alpha, start = 0, end = 0):
-        print(method)
-        if(method == 'test'):
-            for ii in range(alpha.shape[0]):
-                mean = np.nanmean(alpha[ii,:])
-                alpha[ii,:] = alpha[ii,:] - mean
-            
-        if(method == "IND"):
-            inds = pd.read_csv('groupdata.csv', index_col='date')
-            #start = np.where(inds.index == start)[0].tolist()[0]
-            #end = np.where(inds.index == end)[0].tolist()[0]
-            for di in range(start, end+1):
-                series = inds.iloc[di,:]
-                for ind in series.unique():
-                    cond = (series==ind)
-                    mean = np.nanmean(alpha[di-start][cond])
-                    alpha[di-start][cond] = alpha[di-start][cond] - mean
-            '''
-        if(method == "MV"):
-            1
-        else:
-            print("No such Neutralization!!")
-            '''
-        return alpha
-    
-    def rank_col(data):
-        return pd.DataFrame(data).rank(pct=True, axis=1)
-    def rank_row(data):
-        return pd.DataFrame(data).rank(pct=True, axis=0)
-    def tsmax(data, window):
-        rank = np.full([data.shape[0], data.shape[1]], np.nan)
-        for ii in range(window, data.shape[0]+1):
-            tmp = data.iloc[ii-window:ii,:]
-            rank[ii-1,:] = self.rank_row(tmp).iloc[-1]
-        return rank
-    
 
 class Alpha(object):
     
@@ -53,6 +13,11 @@ class Alpha(object):
         Calculate your alpha here.
         '''
         pass
+    
+    def save(self, name):
+        
+        np.save(name, self._alpha)
+        print("save successfully!")
         
     def get(self):
         return self._alpha
@@ -86,7 +51,7 @@ class Alphatest(Alpha):
 
 class Alpha1(Alpha):
     '''
-    shrp 1.724
+    shrp 2.029
     '''
     def run(self, hd):
         '''
@@ -94,7 +59,7 @@ class Alpha1(Alpha):
         '''
         delay = 1
         #data = self.close.shift(5)-self.close
-        data = hd['close'].rolling(10).corr(hd['vol'])
+        data = hd['close'].rolling(10).corr(hd['volume'])
 
         start = hd['startidx']
         end = hd['endidx']
@@ -102,7 +67,7 @@ class Alpha1(Alpha):
         #self.alpha = data.iloc[start-delay:end+1,:]
         
         for di in range(start, end+1):
-            self.alpha[di-start,:] = data.iloc[di-delay,:]
+            self._alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
         self._alpha = Op.Neutralize('IND', self._alpha, start, end)
@@ -130,7 +95,7 @@ class Alpha2(Alpha):
         #self.alpha = data.iloc[start-delay:end+1,:]
         
         for di in range(start, end+1):
-            self.alpha[di-start,:] = data.iloc[di-delay,:]
+            self._alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
         self._alpha = Op.Neutralize('IND', self._alpha, start, end)
@@ -158,7 +123,7 @@ class Alpha3(Alpha):
         #self.alpha = data.iloc[start-delay:end+1,:]
         
         for di in range(start, end+1):
-            self.alpha[di-start,:] = data.iloc[di-delay,:]
+            self._alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
         self._alpha = Op.Neutralize('IND', self._alpha, start, end)
@@ -167,7 +132,7 @@ class Alpha3(Alpha):
         
 class Alpha4(Alpha):
     '''
-    shrp 1.814
+    shrp 1.166
     GTJA 1
     '''
     def run(self, hd):
@@ -190,7 +155,7 @@ class Alpha4(Alpha):
         #self.alpha = data.iloc[start-delay:end+1,:]
         
         for di in range(start, end+1):
-            self.alpha[di-start,:] = data.iloc[di-delay,:]
+            self._alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
         self._alpha = Op.Neutralize('IND', self._alpha, start, end)
@@ -276,7 +241,7 @@ class Alpha7(Alpha):
         rank2 = Op.rank_col(hd['vwap'])
         corr = rank1.rolling(5).corr(rank2)
         window = 5
-        for ii in range(window, corr.shape[0]+1):
+        #for ii in range(window, corr.shape[0]+1):
         
         start = hd['startidx']
         end = hd['endidx']
@@ -327,7 +292,7 @@ class Alpha8(Alpha):
 
 class Alpha9(Alpha):
     '''
-    shrp 7.588
+    shrp 7.588 fake!
     GTJA 119
     '''
     def run(self, hd):
@@ -348,7 +313,7 @@ class Alpha9(Alpha):
         rank3 = self.rank_col(self.volume.rolling(15).mean())
         corr2 = rank2.rolling(21).corr(rank3)
         window = 7
-        rank4 = Op.tsrank(corr, 7)
+        rank4 = Op.tsrank(corr2, window)
         #rank4 = np.full([corr2.shape[0], corr2.shape[1]], np.nan)
         #for ii in range(window, corr2.shape[0]+1):
         #    tmp = corr2.iloc[ii-window:ii,:]

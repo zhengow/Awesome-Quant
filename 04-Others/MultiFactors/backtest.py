@@ -65,7 +65,7 @@ class BacktestEngine(object):
             ret_std = np.std(ret_10[ii])
             IC = ret_mean/ret_std
             self.shrp[ii] = IC*np.sqrt(252)
-            print("Year", ii+2010, '.1.1 to', ii+2011, '.1.1 shrp/ret: ', self.shrp[ii], np.sum(ret_10[ii]))
+            print("Year", ii+2010, '.1.1 to', ii+2010, '.12.31 shrp/ret: %2.2f %2.2f', self.shrp[ii], np.sum(ret_10[ii]))
         print("average shrp: ", np.mean(self.shrp))
         
     def show(self):
