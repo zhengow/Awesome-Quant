@@ -1,5 +1,5 @@
 from alf import Alpha10P
-from backtest import BacktestEngine
+from backtest import BacktestPerson
 from data import Data
 import numpy as np
 import pandas as pd
@@ -30,6 +30,6 @@ if __name__ == '__main__':
     alpha = Alpha10P(tradedays, stknums)
     alpha.run(hd)
     #alpha.save('alpha4')
-    bte = BacktestEngine(alpha.get(), trade_date)
+    bte = BacktestPerson(alpha.get(), trade_date)
     bte.prints()
     bte.show()

@@ -16,12 +16,14 @@ if __name__ == '__main__':
     alphas = [alpha1, alpha4]
     
     #which alpha
+    window = 250
+    print("window:",window)
     mlalpha = Mlalpha(alphas, trade_date)
     mlalpha.set_model()
-    mlalpha.train()
+    mlalpha.train(window)
     mlalpha.predict()
     alpha = mlalpha._alphas['test']
-    
+    alpha = np.full([2431, 3933], 0.002)
     bte = BacktestEngine(alpha, trade_date)
     bte.prints()
     bte.show()

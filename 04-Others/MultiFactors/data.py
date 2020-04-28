@@ -15,7 +15,10 @@ class Data():
     '''
     
     def get(data, startdate, enddate, hist = 0):
-
+        
+        if(data=='symbols'):
+            return pd.read_csv('symbols.csv', header=None)
+        
         if(data=='date'):
             start = 0
             end = 0

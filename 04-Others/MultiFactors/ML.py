@@ -11,7 +11,7 @@ class Mlalpha(object):
     
     def __init__(self, alphas, trade_date):
         
-        dailyret = Data.get('ret', trade_date.iloc[0], trade_date.iloc[-1])
+        dailyret = Data.get('ret2', trade_date.iloc[0], trade_date.iloc[-1])
         stop = Data.get('all', trade_date.iloc[0], trade_date.iloc[-1])
         dailyret[pd.isnull(stop)] = np.nan
         dailyret = np.array(dailyret)
@@ -61,7 +61,7 @@ class Mlalpha(object):
     def get(self):
         return self._alphas
     
-    def train(self, window = 10):
+    def train(self, window = 1):
         window = self.col*window
         x = self._x[:window,:]
         y = self._y[:window,:]

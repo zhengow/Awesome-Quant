@@ -31,6 +31,20 @@ class Op(object):
             '''
         return alpha
     
+    def personalize(data):
+        alpha = np.full([data.shape[0], data.shape[1]], np.nan)
+        for di in range(data.shape[0]):
+            tmp = data[di,:]
+            tmp[pd.isnull(tmp)] = 0
+            idx = np.argpartition(tmp, -5)[-5:]
+            if(di%5==0):
+                for ii in idx:
+                    alpha[di,ii] = tmp[ii]
+            else:
+                alpha[di,:] = alpha[di-1,:]
+        
+        return alpha
+    
     def rank_col(data):
         return pd.DataFrame(data).rank(pct=True, axis=1)
     def rank_row(data):
