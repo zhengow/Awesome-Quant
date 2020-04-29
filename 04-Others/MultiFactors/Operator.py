@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-
+from data import Data
 class Op(object):
     
     def __init__(self):
@@ -35,7 +35,7 @@ class Op(object):
         alpha = np.full([data.shape[0], data.shape[1]], np.nan)
         for di in range(data.shape[0]):
             tmp = data[di,:]
-            tmp[pd.isnull(tmp)] = 0
+            tmp[pd.isnull(tmp)] = -10
             idx = np.argpartition(tmp, -5)[-5:]
             if(di%5==0):
                 for ii in idx:
@@ -45,6 +45,18 @@ class Op(object):
         
         return alpha
     
+    def trend(data, startdate, enddate):
+        alpha = data
+        inx = Data.get('inx500', startdate, enddate, hist = 120)
+        #inx = inx.iloc[start:end, :]
+        trend = inx.rolling(5).mean()-inx.rolling(10).mean()*1.01
+        start = np.where(trend.index == startdate)[0].tolist()[0]
+        end = np.where(trend.index == enddate)[0].tolist()[0]
+        for di in range(alpha.shape[0]):
+            if(trend.iloc[start+di-1,0]<0):
+                alpha[di,:] = np.nan
+        return alpha, trend
+        
     def rank_col(data):
         return pd.DataFrame(data).rank(pct=True, axis=1)
     def rank_row(data):

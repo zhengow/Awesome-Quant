@@ -24,7 +24,7 @@ if __name__ == '__main__':
     # stknums = close.shape[1]
     # startidx = np.where(close.index == start_trade)[0].tolist()[0]
     # endidx = np.where(close.index == end_trade)[0].tolist()[0]
-    # hd = {'amount':amount, 'close':close, 'open':ops, 'high':high, 'low':low, 'vwap':vwap, 'volume':volume, 'startidx':startidx, 'endidx':endidx, 'stknums':stknums}
+    # hd = {'amount':amount, 'close':close, 'open':ops, 'high':high, 'low':low, 'vwap':vwap, 'volume':volume, 'startidx':startidx, 'endidx':endidx, 'stknums':stknums, 'startdate':start_trade, 'enddate':end_trade}
 
     #which alpha
     alpha = Alpha10P(tradedays, stknums)

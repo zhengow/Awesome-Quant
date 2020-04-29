@@ -69,11 +69,11 @@ class BacktestEngine(object):
             ret_10.append(self.ret[len_10*ii:len_10*(ii+1)])
         ret_10.append(self.ret[len_10*9:])
         for ii in range(10):
-            ret_mean = np.mean(ret_10[ii])
-            ret_std = np.std(ret_10[ii])
+            ret_mean = np.nanmean(ret_10[ii])
+            ret_std = np.nanstd(ret_10[ii])
             IC = ret_mean/ret_std
             self.shrp[ii] = IC*np.sqrt(252)
-            print("Year", ii+2010, '.1.1 to', ii+2011, '.1.1 shrp/ret: ', self.shrp[ii], np.sum(ret_10[ii]))
+            print("Year", ii+2010, '.1.1 to', ii+2011, '.1.1 shrp/ret: ', self.shrp[ii], np.nansum(ret_10[ii]))
         print("average shrp: ", np.mean(self.shrp[1:]))
         
     def show(self):
@@ -115,9 +115,12 @@ class BacktestPerson(BacktestEngine):
         self.run(alpha)
     
     def run(self, alpha):
+        
         for ii in range(self.trade_days):
             idx = np.where(alpha[ii,:]>0)
-            self.stocks[ii,:] = self.symbols.iloc[idx[0],0]
+            #print("idx:",idx[0])
+            if(len(idx[0])>0):
+                self.stocks[ii,:] = self.symbols.iloc[idx[0],0]
             ret = self.dailyret.iloc[ii,:]
             cond = pd.isnull(ret)
             ret[cond] = 0
@@ -127,7 +130,7 @@ class BacktestPerson(BacktestEngine):
             pos = pos/np.sum(pos)
             
             self.posret[ii] = np.dot(pos, ret)
-            self.negret[ii] = -self.inxret.iloc[ii,0]*0.1
+            #self.negret[ii] = -self.inxret.iloc[ii,0]*0.1
             if(np.isnan(self.posret[ii])):
                 self.ret[ii] = self.negret[ii]
                 continue
@@ -141,5 +144,8 @@ class BacktestPerson(BacktestEngine):
             if(np.isnan(self.ret[ii])):
                 self.cash[ii+1] = self.cash[ii]
             else:
-                self.cash[ii+1] = self.cash[ii]*(1+self.ret[ii])
+                if(ii%5==0):
+                    self.cash[ii+1] = self.cash[ii]*(1+self.ret[ii]-0.0015)
+                else:
+                    self.cash[ii+1] = self.cash[ii]*(1+self.ret[ii])
         

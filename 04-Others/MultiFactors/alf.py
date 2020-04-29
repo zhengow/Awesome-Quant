@@ -578,7 +578,7 @@ class Alpha10P(Alpha):
         delay = 1
 
         rank1 = Op.rank_col(hd['volume'])
-        rank2 = Op.rank_col(hd['vwap'])
+        rank2 = Op.rank_col(hd['close'])
         
         corr = rank1.rolling(5).corr(rank2)
         rank3 = Op.rank_col(corr)
@@ -587,6 +587,8 @@ class Alpha10P(Alpha):
         
         data = -tsmax
         
+        startdate = hd['startdate']
+        enddate = hd['enddate']
         start = hd['startidx']
         end = hd['endidx']
         
@@ -599,6 +601,9 @@ class Alpha10P(Alpha):
         
         self._alpha = Op.personalize(self._alpha)
         print("Person is finished!")
+        
+        self._alpha, self.trend = Op.trend(self._alpha, startdate, enddate)
+        print("Trend is finished!")
 
         
         
