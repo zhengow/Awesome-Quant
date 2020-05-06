@@ -75,6 +75,7 @@ class BacktestEngine(object):
             self.shrp[ii] = IC*np.sqrt(252)
             print("Year", ii+2010, '.1.1 to', ii+2011, '.1.1 shrp/ret: ', self.shrp[ii], np.nansum(ret_10[ii]))
         print("average shrp: ", np.mean(self.shrp[1:]))
+        print("average return: ", np.mean(self.ret)*252)
         
     def show(self):
         len_10 = len(self.trade_date)//10

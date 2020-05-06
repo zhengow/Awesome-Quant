@@ -2,16 +2,15 @@ import numpy as np
 import pandas as pd
 from Operator import Op
 from data import Data
-from sklearn.linear_model import Lasso
-from sklearn.linear_model import LinearRegression
-from sklearn import svm
-from sklearn import ensemble
 
 class Mlalpha(object):
     
     def __init__(self, alphas, trade_date):
         
         dailyret = Data.get('ret2', trade_date.iloc[0], trade_date.iloc[-1])
+        self.start = np.where(dailyret.index == trade_date.iloc[0])[0].tolist()[0]
+        self.end = np.where(dailyret.index == trade_date.iloc[-1])[0].tolist()[0]
+        
         stop = Data.get('all', trade_date.iloc[0], trade_date.iloc[-1])
         dailyret[pd.isnull(stop)] = np.nan
         dailyret = np.array(dailyret)
@@ -19,30 +18,25 @@ class Mlalpha(object):
         self.num = len(alphas)
         self.row = alphas[0].shape[0]
         self.col = alphas[0].shape[1]
-        
+        self._alpha = np.full([self.row, self.col], np.nan)
         self._y = dailyret.reshape(-1,1)
         self._trainalpha = np.full([self.num, self.row, self.col], np.nan)
         self._x = np.full([self.row*self.col, self.num], np.nan)
         self.resize(alphas)
-        self._models = self.set_model()
-        self._init_alpha()
+        #self._models = self.set_model()
+        #self._init_alpha()
         #self._alphas = np.full([alphas[0].shape[0], alphas[0].shape[1]], np.nan)
-
-    
-    def _init_alpha(self):
-        self._alphas = dict()
-        for key in self._models.keys():
-            alpha = np.full([self.row, self.col], np.nan)
-            self._alphas[key] = alpha
         
     
-    def set_model(self):
+    def set_model(self, models):
         '''
         add the model we want to use here
         '''
-        models = {'test':LinearRegression()}
+        self._models = models
         
-        return models
+        #models = {'test':svm.SVR()}
+        
+        #return models
     
     def resize(self, alphas):
         '''
@@ -71,12 +65,11 @@ class Mlalpha(object):
         deleterow = np.unique(np.append(ynanrow, xnanrow))
         x = np.delete(x, deleterow, axis = 0)
         y = np.delete(y, deleterow, axis = 0)
-        
+
         for key,model in self._models.items():
             model.fit(x,y)
     
     def predict(self):
-        
         nums = self.col #each time feed how much data
         
         for key, model in self._models.items():
@@ -87,7 +80,10 @@ class Mlalpha(object):
                 x[pd.isnull(x)] = 0
                 y = model.predict(x)
                 y[nanrow] = np.nan
-                self._alphas[key][ii,:] = y[:,0]
+                self._alpha[ii,:] = y.reshape(1,-1)
+        
+        self._alpha = Op.Neutralize('IND', self._alpha, self.start, self.end)
+        print("Neutralize is finished!")
         
         
         
