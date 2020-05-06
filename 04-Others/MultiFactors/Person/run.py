@@ -114,7 +114,7 @@ if __name__ == '__main__':
         weekDay = time.strftime("%A", localTime)
         hour = time.strftime("%H", localTime)
         print(time.strftime("%c", localTime))
-        if( weekDay == "Friday" and hour == 20):
+        if(hour == 20):
             run()
             print("running")
             time.sleep(3600)
