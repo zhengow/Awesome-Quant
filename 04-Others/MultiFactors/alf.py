@@ -412,7 +412,7 @@ class Alpha7P(Alpha):
         
 class Alpha8(Alpha):
     '''
-    shrp 4.621
+    shrp 8.83
     GTJA 114
     '''
     def run(self, hd):
@@ -437,7 +437,7 @@ class Alpha8(Alpha):
         #self.alpha = data.iloc[start-delay:end+1,:]
         
         for di in range(start, end+1):
-            self.alpha[di-start,:] = data.iloc[di-delay,:]
+            self._alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
         self._alpha = Op.Neutralize('IND', self._alpha, start, end)
@@ -464,25 +464,20 @@ class Alpha8P(Alpha):
         data3[data3==0] = np.nan
         data = rank1*rank2/data3
         
-        
-        
         start = hd['startidx']
         end = hd['endidx']
         
         #self.alpha = data.iloc[start-delay:end+1,:]
-
-        alpha = np.full([self._alpha.shape[0], self._alpha.shape[1]], np.nan)
         
         for di in range(start, end+1):
-            alpha[di-start,:] = data.iloc[di-delay,:]
-            
+            self._alpha[di-start,:] = data.iloc[di-delay,:]
         print("Alpha is finished!")
         
-        alpha = Op.Neutralize('IND', alpha, start, end)
+        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
         print("Neutralize is finished!")
         
-        self._alpha = Op.personalize(alpha)
-        print("Person is finished!")
+        self._alpha = Op.personalize(self._alpha)
+        print("Personize is finished!")
       
 
 class Alpha9(Alpha):
