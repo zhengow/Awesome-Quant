@@ -51,7 +51,7 @@ class Alphatest(Alpha):
 
 class Alpha1(Alpha):
     '''
-    shrp 3.86
+    shrp 3.33
     '''
     def run(self, hd):
         '''
@@ -103,7 +103,7 @@ class Alpha1P(Alpha):
         
 class Alpha2(Alpha):
     '''
-    shrp 3.3
+    shrp 2.86
     '''
     def run(self, hd):
         '''
@@ -129,7 +129,7 @@ class Alpha2(Alpha):
         
 class Alpha3(Alpha):
     '''
-    shrp 4.097
+    shrp 3.73
     '''
     def run(self, hd):
         '''
@@ -184,7 +184,7 @@ class Alpha3P(Alpha):
         
 class Alpha4(Alpha):
     '''
-    shrp 6.048
+    shrp 5.88
     GTJA 1
     '''
     def run(self, hd):
@@ -249,7 +249,7 @@ class Alpha4P(Alpha):
 
 class Alpha5(Alpha):
     '''
-    shrp 2.91
+    shrp 2.61
     GTJA 2
     '''
     def run(self, hd):
@@ -275,7 +275,7 @@ class Alpha5(Alpha):
         
 class Alpha6(Alpha):
     '''
-    shrp 4.619
+    shrp 4.58
     GTJA 7
     '''
     def run(self, hd):
@@ -348,7 +348,7 @@ class Alpha6P(Alpha):
 
 class Alpha7(Alpha):
     '''
-    shrp 3.797
+    shrp 2.38
     GTJA 16
     '''
     def run(self, hd):
@@ -412,7 +412,7 @@ class Alpha7P(Alpha):
         
 class Alpha8(Alpha):
     '''
-    shrp 8.83
+    shrp 8.63
     GTJA 114
     '''
     def run(self, hd):
@@ -479,56 +479,6 @@ class Alpha8P(Alpha):
         self._alpha = Op.personalize(self._alpha)
         print("Personize is finished!")
       
-
-class Alpha9(Alpha):
-    '''
-    shrp 7.588 fake!
-    GTJA 119
-    '''
-    def run(self, hd):
-        '''
-        Calculate!
-        '''
-        delay = 1
-
-        self.volume[self.volume==0] = np.nan
-
-        data1 = self.volume.rolling(5).mean()
-        data1 = data1.rolling(26).sum()
-        corr = self.vwap.rolling(5).corr(data1)
-        data1 = corr.ewm(7).mean()
-        rank1 = self.rank_col(data1)
-        rank1 = np.array(rank1)
-        rank2 = self.rank_col(self.open)
-        rank3 = self.rank_col(self.volume.rolling(15).mean())
-        corr2 = rank2.rolling(21).corr(rank3)
-        window = 7
-        rank4 = Op.tsrank(corr2, window)
-        #rank4 = np.full([corr2.shape[0], corr2.shape[1]], np.nan)
-        #for ii in range(window, corr2.shape[0]+1):
-        #    tmp = corr2.iloc[ii-window:ii,:]
-        #    rank4[ii-1,:] = self.rank_row(tmp).iloc[-1,:]
-        
-        data2 = pd.DataFrame(rank4)
-        data2 = data2.ewm(8).mean()
-        rank5 = self.rank_col(data2)
-        rank5 = np.array(rank5)
-        data = rank5-rank1
-        data = pd.DataFrame(data)
-        #start = np.where(data.index == self.start)[0].tolist()[0]
-        #end = np.where(data.index == self.end)[0].tolist()[0]
-        
-        #self.alpha = data.iloc[start-delay:end+1,:]
-        
-        start = hd['startidx']
-        end = hd['endidx']
-        
-        for di in range(start, end+1):
-            self.alpha[di-start,:] = data.iloc[di-delay,:]
-        print("Alpha is finished!")
-        
-        self._alpha = Op.Neutralize('IND', self._alpha, start, end)
-        print("Neutralize is finished!")
 
 class Alpha10(Alpha):
     '''
@@ -599,7 +549,3 @@ class Alpha10P(Alpha):
         
         self._alpha, self.trend = Op.trend(self._alpha, startdate, enddate)
         print("Trend is finished!")
-
-        
-        
-        

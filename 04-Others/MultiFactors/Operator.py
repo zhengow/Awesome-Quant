@@ -15,8 +15,6 @@ class Op(object):
             
         if(method == "IND"):
             inds = pd.read_csv('groupdata.csv', index_col='date')
-            #start = np.where(inds.index == start)[0].tolist()[0]
-            #end = np.where(inds.index == end)[0].tolist()[0]
             for di in range(start, end+1):
                 series = inds.iloc[di,:]
                 for ind in series.unique():

@@ -23,20 +23,13 @@ class Mlalpha(object):
         self._trainalpha = np.full([self.num, self.row, self.col], np.nan)
         self._x = np.full([self.row*self.col, self.num], np.nan)
         self.resize(alphas)
-        #self._models = self.set_model()
-        #self._init_alpha()
-        #self._alphas = np.full([alphas[0].shape[0], alphas[0].shape[1]], np.nan)
-        
+
     
     def set_model(self, models):
         '''
         add the model we want to use here
         '''
         self._models = models
-        
-        #models = {'test':svm.SVR()}
-        
-        #return models
     
     def resize(self, alphas):
         '''
@@ -84,7 +77,3 @@ class Mlalpha(object):
         
         self._alpha = Op.Neutralize('IND', self._alpha, self.start, self.end)
         print("Neutralize is finished!")
-        
-        
-        
-        

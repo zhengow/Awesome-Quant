@@ -12,8 +12,8 @@ class BacktestEngine(object):
     process data to standard form.
     """
     
-    def __init__(self, alpha, trade_date):
-        
+    def __init__(self, alpha, trade_date, name):
+        self.name = name
         self.trade_date = trade_date
         self.dailyret = Data.get('ret2', self.trade_date.iloc[0], self.trade_date.iloc[-1])
         self.inxret = Data.get('inxret', self.trade_date.iloc[0], self.trade_date.iloc[-1])
@@ -26,7 +26,7 @@ class BacktestEngine(object):
         self.posret = np.full([self.trade_days],np.nan)
         self.negret = np.full([self.trade_days],np.nan)
         self.ret = np.full([self.trade_days],np.nan)
-        self.shrp = np.full([10],np.nan)
+        self.shrp = np.full([11],np.nan)
         #dummy = alpha.alpha.copy()
         self.run(alpha)
     
@@ -63,29 +63,123 @@ class BacktestEngine(object):
         
         
     def prints(self):
+        idx = [242,486,729,967,1212,1456,1700,1944,2187,2431]
+        print(self.name)
+        ret_11 = []
+        ret_11.append(self.ret[:idx[0]])
+        for ii in range(9):
+            ret_11.append(self.ret[idx[ii]:idx[ii+1]])
+        ret_11.append(self.ret[idx[-1]:])
+        for ii in range(10):
+            ret_mean = np.nanmean(ret_11[ii])
+            ret_std = np.nanstd(ret_11[ii])
+            IC = ret_mean/ret_std
+            self.shrp[ii] = IC*np.sqrt(252)
+            print("%d.1.1 to %d.1.1 shrp/ret: %2.4f / %2.4f%%"%(ii+2010,ii+2011,self.shrp[ii], 100*np.nansum(ret_11[ii])))
+        ret_mean = np.nanmean(ret_11[-1])
+        ret_std = np.nanstd(ret_11[-1])
+        IC = ret_mean/ret_std
+        self.shrp[-1] = IC*np.sqrt(252)
+        print("%d.1.1 to %d.4.1 shrp/ret: %2.4f / %2.4f%%"%(2020,2020,self.shrp[-1], 100*252*np.nanmean(ret_11[-1])))
+        shrp = np.nanmean(self.ret)/np.nanstd(self.ret)*np.sqrt(252)
+        print("average shrp: %2.4f" % shrp)
+        print("average return: %2.4f%%" % (100*np.nanmean(self.ret)*252))
+        
+    def show(self):
+        #len_10 = len(self.trade_date)//10
+        locs = np.linspace(1,len(self.trade_date)-1,num=5,endpoint=True,dtype=int)
+        labels=[]
+        for ii in locs:
+            labels.append(self.trade_date.iloc[ii])
+        x = np.arange(len(self.dailyret.index))
+        p1, = plt.plot(x, self.cash[1:])
+        p2, = plt.plot(self.mktcash)
+        plt.legend([p1, p2],[self.name, "Market:inx500"])
+        plt.xticks(locs,(labels))
+        plt.show()
+
+class BacktestML(BacktestEngine):
+
+    """
+    This class is used to read data,
+    process data to standard form.
+    """
+    def prints(self):
+        idx = [242,486,729,967,1212,1456,1700,1944,2187,2431]
+        print(self.name)
+        ret_11 = []
+        ret_11.append(self.ret[:idx[0]])
+        for ii in range(9):
+            ret_11.append(self.ret[idx[ii]:idx[ii+1]])
+        ret_11.append(self.ret[idx[-1]:])
+        for ii in range(1):
+            ret_mean = np.nanmean(ret_11[ii])
+            ret_std = np.nanstd(ret_11[ii])
+            IC = ret_mean/ret_std
+            self.shrp[ii] = IC*np.sqrt(252)
+            print("%d.1.1 to %d.1.1(InSample) shrp/ret: %2.4f / %2.4f%%"%(ii+2010,ii+2011,self.shrp[ii], 100*np.nansum(ret_11[ii])))
+        for ii in range(1,10):
+            ret_mean = np.nanmean(ret_11[ii])
+            ret_std = np.nanstd(ret_11[ii])
+            IC = ret_mean/ret_std
+            self.shrp[ii] = IC*np.sqrt(252)
+            print("%d.1.1 to %d.1.1(OutSample) shrp/ret: %2.4f / %2.4f%%"%(ii+2010,ii+2011,self.shrp[ii], 100*np.nansum(ret_11[ii])))
+        ret_mean = np.nanmean(ret_11[-1])
+        ret_std = np.nanstd(ret_11[-1])
+        IC = ret_mean/ret_std
+        self.shrp[-1] = IC*np.sqrt(252)
+        print("%d.1.1 to %d.4.1(OutSample) shrp/ret: %2.4f / %2.4f%%"%(2020,2020,self.shrp[-1], 100*252*np.nanmean(ret_11[-1])))
+        shrp = np.nanmean(self.ret[250:])/np.nanstd(self.ret[250:])*np.sqrt(252)
+        print("average shrp(Out Sample): %2.4f" % shrp)
+        print("average return(Out Sample): %2.4f%%" % (100*np.nanmean(self.ret[250:])*252))
+    
+    def prints2(self):
+        print(self.name)
         len_10 = len(self.ret)//10
         ret_10 = []
         for ii in range(9):
             ret_10.append(self.ret[len_10*ii:len_10*(ii+1)])
         ret_10.append(self.ret[len_10*9:])
-        for ii in range(10):
+        for ii in range(1):
             ret_mean = np.nanmean(ret_10[ii])
             ret_std = np.nanstd(ret_10[ii])
             IC = ret_mean/ret_std
             self.shrp[ii] = IC*np.sqrt(252)
-            print("Year", ii+2010, '.1.1 to', ii+2011, '.1.1 shrp/ret: ', self.shrp[ii], np.nansum(ret_10[ii]))
-        print("average shrp: ", np.mean(self.shrp[1:]))
-        print("average return: ", np.mean(self.ret)*252)
+        print("average shrp(In Sample): %2.4f" % self.shrp[0])
+        print("average return(In Sample): %2.4f%%" % (100*np.nansum(ret_10[0])))
         
+        for ii in range(1,10):
+            ret_mean = np.nanmean(ret_10[ii])
+            ret_std = np.nanstd(ret_10[ii])
+            IC = ret_mean/ret_std
+            self.shrp[ii] = IC*np.sqrt(252)
+
+        shrp = np.nanmean(self.ret[250:])/np.nanstd(self.ret[250:])*np.sqrt(252)
+        print("average shrp(Out Sample): %2.4f" % shrp)
+        print("average return(Out Sample): %2.4f%%" % (100*np.nanmean(self.ret[250:])*252))
+        
+    
     def show(self):
-        len_10 = len(self.trade_date)//10
-        xticks = []
-        for ii in range(10):
-            xticks.append(self.trade_date.iloc[ii*len_10])
-        x = np.arange(len(self.dailyret.index))
-        plt.plot(x, self.cash[1:])
-        plt.plot(self.mktcash)
-        #plt.xticks(xticks)
+        cash = np.full([self.trade_days+1],1000000.0)
+        mktcash = np.full([self.trade_days+1],1000000.0)
+        window = 250
+        for ii in range(self.trade_days-window):
+            mktcash[ii+window+1] = mktcash[ii+window]*(1+self.inxret.iloc[ii+window,0])
+            if(np.isnan(self.ret[ii+window])):
+                cash[window+ii+1] = cash[ii+window]
+            else:
+                cash[window+ii+1] = cash[ii+window]*(1+self.ret[ii+window])
+        #len_10 = len(self.trade_date)//10
+        locs = np.linspace(window,len(self.trade_date)-1,num=5,endpoint=True,dtype=int)
+        labels=[]
+        for ii in locs:
+            labels.append(self.trade_date.iloc[ii])
+        locs = np.linspace(1,len(self.trade_date)-window-1,num=5,endpoint=True,dtype=int)
+        #x = np.arange(len(self.dailyret.index)-window)
+        p1, = plt.plot(cash[window:])
+        p2, = plt.plot(mktcash[window:])
+        plt.legend([p1, p2],[self.name, "Market:inx500"])
+        plt.xticks(locs,(labels))
         plt.show()
 
 class BacktestPerson(BacktestEngine):
@@ -149,4 +243,3 @@ class BacktestPerson(BacktestEngine):
                     self.cash[ii+1] = self.cash[ii]*(1+self.ret[ii]-0.0015)
                 else:
                     self.cash[ii+1] = self.cash[ii]*(1+self.ret[ii])
-        

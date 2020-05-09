@@ -5,20 +5,9 @@ class Data():
     
     def __init__():
         pass
-        #self.trade_date = self.get_trade_date(start_date, end_date)
-        
-    '''
-    def get_trade_date(start_date, end_date):
-        
-        date = pd.read_csv('date.csv')
-        return date.loc[start_date:end_date,:]
-    '''
     
     def get(data, startdate, enddate, hist = 0):
-        
-        if(data=='symbols'):
-            return pd.read_csv('symbols.csv', header=None)
-        
+
         if(data=='date'):
             start = 0
             end = 0
