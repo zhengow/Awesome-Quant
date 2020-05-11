@@ -58,7 +58,7 @@ def run():
     
     stks = alpha[idx]
     
-    inx = pro.index_daily(ts_code='000905.SH', start_date=lastMonth, end_date=today)['close']
+    inx = pro.index_daily(ts_code='000905.SH', start_date=lastMonth, end_date=today)['close'][::-1]
     
     trend = (inx.rolling(5).mean()-1.01*inx.rolling(10).mean()).iloc[-1]
     
